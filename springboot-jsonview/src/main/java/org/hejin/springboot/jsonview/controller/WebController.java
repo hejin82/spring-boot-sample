@@ -9,15 +9,21 @@ import javax.annotation.PostConstruct;
 import org.hejin.springboot.jsonview.model.Company;
 import org.hejin.springboot.jsonview.model.Product;
 import org.hejin.springboot.jsonview.view.View;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/")
 public class WebController {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Company apple;
     private Product iphone;
@@ -58,6 +64,17 @@ public class WebController {
     @JsonView(View.ProductView.class)
     @GetMapping("/product/view")
     public Product getProductView() {
+        try {
+            String value =
+                    objectMapper.writerWithView(View.OveralView.class).writeValueAsString(iphone);
+            System.out.println("OveralView value:" + value);
+            value = objectMapper.writerWithView(View.DetailView.class).writeValueAsString(iphone);
+            System.out.println("DetailView value:" + value);
+            value = objectMapper.writerWithView(View.ProductView.class).writeValueAsString(iphone);
+            System.out.println("ProductView value:" + value);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return iphone;
     }
 }
